@@ -23,8 +23,6 @@ func Same(t1, t2 *tree.Tree) bool {
 	ch1, ch2 := make(chan int), make(chan int)
 	go Walk(t1, ch1)
 	go Walk(t2, ch2)
-
-	
 }
 
 func main() {
