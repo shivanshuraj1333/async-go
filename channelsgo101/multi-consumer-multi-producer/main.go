@@ -35,35 +35,46 @@ var messages = [][]string{
 	},
 }
 
-var consumers = 5
-
-func produce(link chan string, i int, wg *sync.WaitGroup){
-	defer wg.Done()
+func producer(link chan string, wgp *sync.WaitGroup, i int) {
+	defer wgp.Done()
 	for _, v := range messages[i] {
 		link <- v + " | producerID-" + strconv.Itoa(i)
 	}
 }
 
-func consume(link chan string, done chan bool) {
-	defer close(done)
+func consumer(link chan string, wgc *sync.WaitGroup, i int) {
+	defer wgc.Done()
 	for ele := range link {
-		fmt.Println(ele)
+		fmt.Printf("%d-consId-%s\n", i, ele)
 	}
-	done <- true
 }
 
+const consumerCount int = 3
+
 func main(){
-	link := make(chan string, 18)
+	link := make(chan string, 20)
 	done := make(chan bool)
-	wg := new(sync.WaitGroup)
-	go func(_link chan string, wg *sync.WaitGroup) {
+
+	wgp := new(sync.WaitGroup)
+	wgc := new(sync.WaitGroup)
+
+	go func(_link chan string, wgp *sync.WaitGroup) {
 		defer close(_link)
 		for i:=0; i<len(messages); i++ {
-			wg.Add(1)
-			go produce(_link, i, wg)
+			wgp.Add(1)
+			go producer(_link, wgp, i)
 		}
-		wg.Wait()
-	}(link, wg)
-	go consume(link, done)
+		wgp.Wait()
+	}(link, wgp)
+
+	go func(_link chan string, wgc *sync.WaitGroup, done chan bool) {
+		defer close(done)
+		for i:=0; i<consumerCount; i++ {
+			wgc.Add(1)
+			go consumer(_link, wgc, i)
+		}
+		wgc.Wait()
+		done <- true
+	}(link, wgc, done)
 	<- done
 }
