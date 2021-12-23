@@ -1,2 +1,2 @@
 # gobasics
-examples to make you comfortable with Golang (from zero to advance)
+Handpicked examples to make you comfortable with async programming in Golang (from zero to advance)
