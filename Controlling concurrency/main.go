@@ -12,7 +12,7 @@ var (
 var concurrencyLevel = 3
 
 func makeRequest(ID int) {
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second)
 	fmt.Println(ID)
 }
 
