@@ -28,4 +28,8 @@ func main() {
 			makeRequest(ID)
 		}(_ID)
 	}
+
+	for i := 0; i < concurrencyLevel; i++ {
+		queue <- true
+	}
 }
